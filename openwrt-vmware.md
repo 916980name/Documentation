@@ -6,6 +6,18 @@ Convert openwrt.img to VBox drive
 ```
 VBoxManage convertfromraw --format VDI openwrt-23.05.4-x86-64-generic-squashfs-combined-efi.img openwrt.vdi
 ```
+When convert fail
+```
+Converting from raw image file="openwrt-23.05.4-sunxi-cortexa7-friendlyarm_nanopi-m1-plus-squashfs-sdcard.img" to file="openwrt-23.05.4-friendlyarm_nanopi.vdi"...
+Creating dynamic image with size 27277434 bytes (27MB)...
+VBoxManage: error: VD: The given disk size 27277434 is not aligned on a sector boundary (512 bytes)
+VBoxManage: error: Error code VERR_VD_INVALID_SIZE at /home/vbox/tinderbox/build-VBox-7.0/svn/src/VBox/Storage/VD.cpp(6052) in function int VDCreateBase(PVDISK, const char*, const char*, uint64_t, unsigned int, const char*, PCVDGEOMETRY, PCVDGEOMETRY, PCRTUUID, unsigned int, PVDINTERFACE, PVDINTERFACE)
+VBoxManage: error: Cannot create the disk image "openwrt-23.05.4-friendlyarm_nanopi.vdi": VERR_VD_INVALID_SIZE
+```
+[solution](https://stackoverflow.com/a/59179239/8936864)
+```
+truncate openwrt-23.05.4-sunxi-cortexa7-friendlyarm_nanopi-m1-plus-squashfs-sdcard.img --size=128M
+```
 
 ### Settings
 1. virtualbox -> file -> Host network manager -> create 192.168.56.1
