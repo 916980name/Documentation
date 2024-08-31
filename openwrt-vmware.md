@@ -27,6 +27,11 @@ truncate openwrt-23.05.4-sunxi-cortexa7-friendlyarm_nanopi-m1-plus-squashfs-sdca
 ### Bootup
 
 ### Config
+iptables effect when start
+```
+vim /etc/firewall.user
+```
+
 show network
 ```
 uci show network
@@ -71,6 +76,13 @@ service network restart
 1. sysctl -w net.ipv4.ip_forward=1
 1.  "网关LAN_IP地址段" 通过运行命令"ip address | grep -w "inet" | awk '{print $2}'"获得，是其中的一个
 ```
+iptables -t nat -N V2RAY # 新建一个名为 V2RAY 的链
+iptables -t nat -A V2RAY -d 192.168.1.0/16 -j RETURN # 直连 192.168.0.0/16 
+iptables -t nat -A V2RAY -p tcp -j RETURN -m mark --mark 0xff # 直连 SO_MARK 为 0xff 的流量(0xff 是 16 进制数，数值上等同与上面配置的 255)，此规则目的是避免代理本机(网关)流量出现回环问题
+iptables -t nat -A V2RAY -p tcp -j REDIRECT --to-ports 1090 # 其余流量转发到 12345 端口（即 V2Ray）
+iptables -t nat -A PREROUTING -p tcp -j V2RAY # 对局域网其他设备进行透明代理
+iptables -t nat -A OUTPUT -p tcp -j V2RAY # 对本机进行透明代理
+
 ip rule add fwmark 1 table 100
 ip route add local 0.0.0.0/0 dev lo table 100
 iptables -t mangle -N XRAY
@@ -78,4 +90,15 @@ iptables -t mangle -A XRAY ! -s 192.168.1.5 -j RETURN
 iptables -t mangle -A XRAY -p tcp -j TPROXY --on-port 12345 --tproxy-mark 1
 iptables -t mangle -A XRAY -p udp -j TPROXY --on-port 12345 --tproxy-mark 1
 iptables -t mangle -A PREROUTING -j XRAY
+```
+
+### Problem
+1. wget failed: Failed to allocate uclient context
+```
+opkg print-architecture
+```
+
+### Qemu
+```
+qemu-system-arm -m 1024 -machine orangepi-pc -drive format=raw,file=openwrt-23.05.4-sunxi-cortexa7-friendlyarm_nanopi-m1-plus-ext4-sdcard.img -nographic
 ```
