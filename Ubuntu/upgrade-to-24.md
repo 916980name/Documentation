@@ -31,5 +31,7 @@ UI broken, need to `Ctrl + Alt + F2` enter command line.
 
 ### The mouse scroll wheel is not working well
 ### The keyboard key mapping is incorrect
-Tab, direction key.
+Tab, direction key.  
 > These two problems recovered automaticly after I am using about 10 minutes. Maybe the driver installed automaticly.
+
+Actually it is like the `shift` key been pressing, input something with `shift` key could work.
