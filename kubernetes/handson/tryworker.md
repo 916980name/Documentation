@@ -1,9 +1,20 @@
+## Trouble Shooting
+####  cgroup mountpoint does not exist: unknown
+(github)[https://github.com/golioth/ostentus/blob/24606b3cbcb2e731fca98ed67ee1391a8ce4e8f2/build-with-docker.md]
+```
+sudo mkdir /sys/fs/cgroup/systemd
+sudo mount -t cgroup -o none,name=systemd cgroup /sys/fs/cgroup/systemd
+```
+
+
 ### Configure CNI Networking
+For different node:
+> POD_CIDR=10.200.1.0/24
+> POD_CIDR=10.200.2.0/24
 ```bash
-POD_CIDR=192.168.56.0/24
 cat <<EOF | sudo tee /etc/cni/net.d/10-bridge.conf
 {
-    "cniVersion": "1.3.0",
+    "cniVersion": "1.0.0",
     "name": "bridge",
     "type": "bridge",
     "bridge": "cnio0",
@@ -20,10 +31,28 @@ cat <<EOF | sudo tee /etc/cni/net.d/10-bridge.conf
 EOF
 ```
 
+### Configure containerd
+```
+cat << EOF | sudo tee /etc/containerd/config.toml
+[plugins]
+  [plugins.cri.containerd]
+    snapshotter = "overlayfs"
+    [plugins.cri.containerd.default_runtime]
+      runtime_type = "io.containerd.runtime.v1.linux"
+      runtime_engine = "/usr/local/bin/runc"
+      runtime_root = ""
+[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+    SystemdCgroup = true
+EOF
+```
+
 ### Configure the Kubelet
+For different node:
+> POD_CIDR=10.200.1.0/24
+> POD_CIDR=10.200.2.0/24
 ```bash
 WORKER_NAME=`hostname`
-POD_CIDR=192.168.56.0/24
 
 sudo ln -s /home/ubuntu/${WORKER_NAME}.pem /var/lib/kubelet/${WORKER_NAME}.pem
 sudo ln -s /home/ubuntu/${WORKER_NAME}-key.pem /var/lib/kubelet/${WORKER_NAME}-key.pem
@@ -50,6 +79,7 @@ resolvConf: "/run/systemd/resolve/resolv.conf"
 runtimeRequestTimeout: "15m"
 tlsCertFile: "/var/lib/kubelet/${WORKER_NAME}.pem"
 tlsPrivateKeyFile: "/var/lib/kubelet/${WORKER_NAME}-key.pem"
+cgroupDriver: systemd
 EOF
 ```
 

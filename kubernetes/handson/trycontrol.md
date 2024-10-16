@@ -233,54 +233,54 @@ done
     done
     ```
 1. bash-create-kube-apiserver-service.sh 
-    ```bash
-    INTERNAL_IP=192.168.56.1
-    KUBERNETES_PUBLIC_ADDRESS=k8s.local
-    ETCD_SERVER=192.168.56.1
+```bash
+INTERNAL_IP=192.168.56.1
+KUBERNETES_PUBLIC_ADDRESS=k8s.local
+ETCD_SERVER=192.168.56.1
 
-    cat <<EOF | sudo tee /etc/systemd/system/kube-apiserver.service
-    [Unit]
-    Description=Kubernetes API Server
-    Documentation=https://github.com/kubernetes/kubernetes
+cat <<EOF | sudo tee /etc/systemd/system/kube-apiserver.service
+[Unit]
+Description=Kubernetes API Server
+Documentation=https://github.com/kubernetes/kubernetes
 
-    [Service]
-    ExecStart=/usr/local/bin/kube-apiserver \\
-    --advertise-address=${INTERNAL_IP} \\
-    --allow-privileged=true \\
-    --apiserver-count=3 \\
-    --audit-log-maxage=30 \\
-    --audit-log-maxbackup=3 \\
-    --audit-log-maxsize=100 \\
-    --audit-log-path=/var/log/audit.log \\
-    --authorization-mode=Node,RBAC \\
-    --bind-address=0.0.0.0 \\
-    --client-ca-file=/var/lib/kubernetes/ca.pem \\
-    --enable-admission-plugins=NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota \\
-    --etcd-cafile=/var/lib/kubernetes/ca.pem \\
-    --etcd-certfile=/var/lib/kubernetes/kubernetes.pem \\
-    --etcd-keyfile=/var/lib/kubernetes/kubernetes-key.pem \\
-    --etcd-servers=https://${ETCD_SERVER}:2379 \\
-    --event-ttl=1h \\
-    --encryption-provider-config=/var/lib/kubernetes/encryption-config.yaml \\
-    --kubelet-certificate-authority=/var/lib/kubernetes/ca.pem \\
-    --kubelet-client-certificate=/var/lib/kubernetes/kubernetes.pem \\
-    --kubelet-client-key=/var/lib/kubernetes/kubernetes-key.pem \\
-    --runtime-config='api/all=true' \\
-    --service-account-key-file=/var/lib/kubernetes/service-account.pem \\
-    --service-account-signing-key-file=/var/lib/kubernetes/service-account-key.pem \\
-    --service-account-issuer=https://${KUBERNETES_PUBLIC_ADDRESS}:443 \\
-    --service-cluster-ip-range=10.32.0.0/24 \\
-    --service-node-port-range=30000-32767 \\
-    --tls-cert-file=/var/lib/kubernetes/kubernetes.pem \\
-    --tls-private-key-file=/var/lib/kubernetes/kubernetes-key.pem \\
-    --v=2
-    Restart=on-failure
-    RestartSec=5
+[Service]
+ExecStart=/usr/local/bin/kube-apiserver \\
+--advertise-address=${INTERNAL_IP} \\
+--allow-privileged=true \\
+--apiserver-count=3 \\
+--audit-log-maxage=30 \\
+--audit-log-maxbackup=3 \\
+--audit-log-maxsize=100 \\
+--audit-log-path=/var/log/audit.log \\
+--authorization-mode=Node,RBAC \\
+--bind-address=0.0.0.0 \\
+--client-ca-file=/var/lib/kubernetes/ca.pem \\
+--enable-admission-plugins=NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota \\
+--etcd-cafile=/var/lib/kubernetes/ca.pem \\
+--etcd-certfile=/var/lib/kubernetes/kubernetes.pem \\
+--etcd-keyfile=/var/lib/kubernetes/kubernetes-key.pem \\
+--etcd-servers=https://${ETCD_SERVER}:2379 \\
+--event-ttl=1h \\
+--encryption-provider-config=/var/lib/kubernetes/encryption-config.yaml \\
+--kubelet-certificate-authority=/var/lib/kubernetes/ca.pem \\
+--kubelet-client-certificate=/var/lib/kubernetes/kubernetes.pem \\
+--kubelet-client-key=/var/lib/kubernetes/kubernetes-key.pem \\
+--runtime-config='api/all=true' \\
+--service-account-key-file=/var/lib/kubernetes/service-account.pem \\
+--service-account-signing-key-file=/var/lib/kubernetes/service-account-key.pem \\
+--service-account-issuer=https://${KUBERNETES_PUBLIC_ADDRESS}:6443 \\
+--service-cluster-ip-range=10.32.0.0/24 \\
+--service-node-port-range=30000-32767 \\
+--tls-cert-file=/var/lib/kubernetes/kubernetes.pem \\
+--tls-private-key-file=/var/lib/kubernetes/kubernetes-key.pem \\
+--v=2
+Restart=on-failure
+RestartSec=5
 
-    [Install]
-    WantedBy=multi-user.target
-    EOF
-    ```
+[Install]
+WantedBy=multi-user.target
+EOF
+```
 
 ### Configure the Kubernetes Controller Manager
 1. copy file
@@ -313,4 +313,24 @@ cat <<EOF | sudo tee -a /etc/hosts
 192.168.56.201 ip-192-168-56-201
 192.168.56.202 ip-192-168-56-202
 EOF
+```
+
+### The Admin Kubernetes Configuration File
+```bash
+KUBERNETES_PUBLIC_ADDRESS=k8s.local
+
+kubectl config set-cluster kubernetes-the-hard-way \
+  --certificate-authority=ca.pem \
+  --embed-certs=true \
+  --server=https://${KUBERNETES_PUBLIC_ADDRESS}:6443
+
+kubectl config set-credentials admin \
+  --client-certificate=admin.pem \
+  --client-key=admin-key.pem
+
+kubectl config set-context kubernetes-the-hard-way \
+  --cluster=kubernetes-the-hard-way \
+  --user=admin
+
+kubectl config use-context kubernetes-the-hard-way
 ```
