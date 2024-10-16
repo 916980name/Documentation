@@ -47,28 +47,29 @@ journalctl -u kube-controller-manager.service -f
 
 ### Pem keys and certs
 1. bash-kubelet-client-certificates.sh
-    ```bash
-    for i in 0 1 2; do
-    instance="worker-${i}"
+
+```bash
+for i in 0 1 2; do
     instance_hostname="ip-192-168-56-20${i}"
+    instance=${instance_hostname}
     cat > ${instance}-csr.json <<EOF
+{
+"CN": "system:node:${instance_hostname}",
+"key": {
+    "algo": "rsa",
+    "size": 2048
+},
+"names": [
     {
-    "CN": "system:node:${instance_hostname}",
-    "key": {
-        "algo": "rsa",
-        "size": 2048
-    },
-    "names": [
-        {
-        "C": "US",
-        "L": "Portland",
-        "O": "system:nodes",
-        "OU": "Kubernetes The Hard Way",
-        "ST": "Oregon"
-        }
-    ]
+    "C": "US",
+    "L": "Portland",
+    "O": "system:nodes",
+    "OU": "Kubernetes The Hard Way",
+    "ST": "Oregon"
     }
-    EOF
+]
+}
+EOF
 
     external_ip="192.168.1.20${i}"
 
@@ -80,9 +81,9 @@ journalctl -u kube-controller-manager.service -f
         -config=ca-config.json \
         -hostname=${instance_hostname},${external_ip},${internal_ip} \
         -profile=kubernetes \
-        worker-${i}-csr.json | cfssljson -bare worker-${i}
-    done
-    ```
+        ${instance}-csr.json | cfssljson -bare ${instance}
+done
+```
 
 1. bash-kubernetes-api-server-certificates.sh
     ```bash
@@ -121,14 +122,17 @@ journalctl -u kube-controller-manager.service -f
     ```bash
     KUBERNETES_PUBLIC_ADDRESS=k8s.local
 
-    for instance in worker-0 worker-1 worker-2; do
+    for i in 0 1 2; do
+    instance_hostname="ip-192-168-56-20${i}"
+    instance=${instance_hostname}
+
     kubectl config set-cluster kubernetes-the-hard-way \
         --certificate-authority=ca.pem \
         --embed-certs=true \
-        --server=https://${KUBERNETES_PUBLIC_ADDRESS}:443 \
+        --server=https://${KUBERNETES_PUBLIC_ADDRESS}:6443 \
         --kubeconfig=${instance}.kubeconfig
     
-    kubectl config set-credentials system:node:${instance} \
+    kubectl config set-credentials system:node:${instance_hostname} \
         --client-certificate=${instance}.pem \
         --client-key=${instance}-key.pem \
         --embed-certs=true \
@@ -136,7 +140,7 @@ journalctl -u kube-controller-manager.service -f
     
     kubectl config set-context default \
         --cluster=kubernetes-the-hard-way \
-        --user=system:node:${instance} \
+        --user=system:node:${instance_hostname} \
         --kubeconfig=${instance}.kubeconfig
     
     kubectl config use-context default --kubeconfig=${instance}.kubeconfig
@@ -150,7 +154,7 @@ journalctl -u kube-controller-manager.service -f
     kubectl config set-cluster kubernetes-the-hard-way \
     --certificate-authority=ca.pem \
     --embed-certs=true \
-    --server=https://${KUBERNETES_PUBLIC_ADDRESS}:443 \
+    --server=https://${KUBERNETES_PUBLIC_ADDRESS}:6443 \
     --kubeconfig=kube-proxy.kubeconfig
 
     kubectl config set-credentials system:kube-proxy \
