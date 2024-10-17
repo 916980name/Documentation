@@ -6,7 +6,7 @@ With two virtualbox machine running ubuntu24.04 server
 - Host-only network IPv4 Prefix: `192.168.56.1/24`
 
 ![topo](Topology-Map.png)
-### Enable network interface
+### Enable virtual machine network interface
 ubuntu24.04
 - Adapter 1: bridged
 - Adapter 2: host-only
