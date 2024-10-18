@@ -34,4 +34,5 @@ UI broken, need to `Ctrl + Alt + F2` enter command line.
 Tab, direction key.  
 > These two problems recovered automaticly after I am using about 10 minutes. Maybe the driver installed automaticly.
 
-Actually it is like the `shift` key been pressing, input something with `shift` key could work.
+Actually it is like the `shift` key been pressing, input something with `shift` key could work.  
+Use left & right `shift`.
