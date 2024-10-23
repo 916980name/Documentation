@@ -1,0 +1,1 @@
+1. Tag numbers 1-15 require one less byte to encode than higher numbers. Each element in a repeated field requires re-encoding the tag number, so repeated fields are particularly good candidates for this optimization.

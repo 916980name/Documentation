@@ -14,3 +14,9 @@ see `go.uber.org/zap/zapcore.Option`
 
 #### 特性开关
 staging/src/k8s.io/component-base/featuregate/feature_gate.go#L109
+
+### Debug Build
+`-ldflags=-compressdwarf=false -gcflags "all=-N -l"`
+- -N, turning off optimization
+- -l, disable inlining
+- -ldflags ... false`, generate uncompressed debug information

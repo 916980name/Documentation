@@ -121,6 +121,7 @@
 ├── scripts
 ├── security
 ├── server                  # module go.etcd.io/etcd/server/v3
+│   ├── (f) main.go         # server entrance(1)
 │   ├── auth
 │   ├── config
 │   ├── datadir
@@ -129,7 +130,10 @@
 │   │       ├── snap
 │   │       └── wal
 │   ├── embed
+│   │   ├── (f) etcd.go     # server entrance(4)
 │   ├── etcdmain
+│   │   ├── (f) main.go     # server entrance(2)
+│   │   ├── (f) etcd.go     # server entrance(3)
 │   ├── etcdserver
 │   │   ├── api
 │   │   │   ├── etcdhttp

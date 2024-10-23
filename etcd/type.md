@@ -12,3 +12,7 @@ Field
 1. (default disabled) Sync synchronizes client's endpoints with the known endpoints from the etcd membership.
 
     Will update `client.cfg.Endpoints`
+
+
+### Q
+1. What does proxy do when start etcd?
