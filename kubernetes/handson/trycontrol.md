@@ -11,7 +11,7 @@ ubuntu24.04
 - Adapter 1: bridged
 - Adapter 2: host-only
 
-`sudo ip link enp0s8 up`
+`sudo ip link set dev enp0s8 up`
 
 /etc/netplan/[xxx]
 ```

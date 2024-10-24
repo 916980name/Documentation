@@ -12,6 +12,8 @@ https://sourceware.org/gdb/current/onlinedocs/gdb.html/TUI-Keys.html#TUI-Keys
 - `C-x 1`, Use a TUI layout with only one window.
 - `C-x 2`, Use a TUI layout with at least two windows
 - `C-x o`, Change the active window
+### gdbgui
+```pipx install gdbgui```
 
 #### print register
 - p $register
