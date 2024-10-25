@@ -22,3 +22,8 @@ https://sourceware.org/gdb/current/onlinedocs/gdb.html/TUI-Keys.html#TUI-Keys
 #### in memory data
 - string: `10\n`
 - byte: `31 30 0a 00 00 00 00 00`
+
+#### Disassembly
+```sh
+objdump -D [binary]
+```
