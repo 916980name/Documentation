@@ -27,3 +27,14 @@ https://sourceware.org/gdb/current/onlinedocs/gdb.html/TUI-Keys.html#TUI-Keys
 ```sh
 objdump -D [binary]
 ```
+#### Compile with debug
+```sh
+gcc -ggdb infiniteHelloworld.c
+```
+#### Modify binary
+```sh
+vim [binary]
+:%!xxd
+:%!xxd -r
+:wq
+```
