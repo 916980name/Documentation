@@ -117,3 +117,77 @@
                             0x5ad38e ret
     }
     ```
+
+### defer panic
+1. snippet
+    ```go
+    func PanicRecoverytest() {
+        defer func() {
+            if err := recover(); err != nil {
+                fmt.Printf("err: %v\n", err)
+            }
+        }()
+        dopanic()
+    }
+
+    func dopanic() {
+        panic("NO !!!")
+    }
+    ```
+1. defer func() {}
+    ```
+    rbp	0xc000078f58	
+    rsp	0xc000078ee0	
+    ```
+1. call 0x43ada0 <runtime.deferreturn>
+    ```assembly
+    00000000005ad1c0 <main.PanicRecoverytest>:
+    5ad1c0:	49 3b 66 10          	cmp    0x10(%r14),%rsp
+    5ad1c4:	0f 86 ac 00 00 00    	jbe    5ad276 <main.PanicRecoverytest+0xb6>
+    5ad1ca:	55                   	push   %rbp
+    5ad1cb:	48 89 e5             	mov    %rsp,%rbp
+    5ad1ce:	48 83 ec 78          	sub    $0x78,%rsp
+    5ad1d2:	48 8d 0d 4f c9 06 00 	lea    0x6c94f(%rip),%rcx        # 619b28 <go:func.*+0x488>
+    5ad1d9:	48 89 4c 24 30       	mov    %rcx,0x30(%rsp)          rcx: 0x619b28 -> e0 d2 5a (is defer function entry)
+    5ad1de:	48 8d 44 24 18       	lea    0x18(%rsp),%rax
+    5ad1e3:	e8 78 d6 e8 ff       	call   43a860 <runtime.deferprocStack>
+                                After this call: 
+                                    rbp	0xc000078f58	
+                                    rsp	0xc000078ed8	
+    5ad1e8:	85 c0                	test   %eax,%eax
+    ...
+    ```
+    ```
+    00000000005ad2e0 <main.PanicRecoverytest.func1
+    ```
+1. func dopanic() {
+    ```
+    rbp	0xc000078ed0
+    rsp	0xc000078ec0
+    ```
+    ```
+    panic("NO !!!") 0x5ad2ae    lea 0x11a8b(%rip),%rax # 0x5bed40   -> 10
+                    0x5ad2b5    lea 0x788bc(%rip),%rbx # 0x625b78   -> c6 29 5f
+                    0x5ad2bc    nopl 0x0(%rax)  main.dopanic+28
+                    0x5ad2c0    call 0x473360 <runtime.gopanic>main.dopanic+32
+                    0x5ad2c5    nop main.dopanic+37
+    ```
+1. 	func gopanic(e any) {
+    ```
+        rbp	0xc000078eb0
+        rsp	0xc000078e10
+    ```
+    > debug broken
+    ```
+    for {
+        // find fn
+        fn()    0x473494    call *%rcx     rcx: 0x5ad2e0 (defer func)
+            rbp	0xc00007de00	
+            rsp	0xc00007dd78
+        ret
+            rbp	0xc00007deb0
+            rsp	0xc00007de08
+    }
+    ```
+    // exit  
+}
