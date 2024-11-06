@@ -36,3 +36,9 @@ Tab, direction key.
 
 Actually it is like the `shift` key been pressing, input something with `shift` key could work.  
 Use left & right `shift`.
+
+Resolved:
+> https://askubuntu.com/questions/1300264/text-is-deleted-when-double-click-the-input-box-in-ubuntu-20-04
+
+remove package: `ibus-sunpinyin`  
+install package: `ibus-libpinyin`
