@@ -20,3 +20,27 @@ staging/src/k8s.io/component-base/featuregate/feature_gate.go#L109
 - -N, turning off optimization
 - -l, disable inlining
 - -ldflags ... false`, generate uncompressed debug information
+
+### pprof
+1. trace
+    ```
+    go tool trace trace.out
+    ```
+1. cpu & mem
+    ```
+    go tool pprof [xxx].prof
+    ```
+1. webui
+    ```
+    go tool pprof -http=:8080  [binary file] ./[xxx].prof
+    ```
+1. webui with running
+    ```golang
+    // 先启动 pprof http 服务器
+    go func() {
+        http.ListenAndServe(":6060", nil)
+    }()
+    ```
+    ```
+    http://localhost:6060/debug/pprof/
+    ```

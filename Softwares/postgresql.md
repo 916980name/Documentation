@@ -1,6 +1,9 @@
 ## psql
 connect: `psql -d [dbname] -U [username] -h [host]`
 ```
+sudo -i -u postgres
+sudo su - postgres
+
 \l - Display database
 \c - Connect to database
 \dn - List schemas
@@ -25,4 +28,13 @@ SELECT currval(pg_get_serial_sequence('prod.user_subscription','id'));
 update sequence
 ```sql
 SELECT setval(pg_get_serial_sequence('the_schema.the_table', 'the_primary_key'), (SELECT MAX(the_primary_key) FROM the_table) + 1);
+```
+
+## dump
+```
+docker exec -t <container_id_or_name> pg_dump -U <username> -d <database_name> -t <table_name> > /path/on/host/machine/dump_file.sql
+```
+## dump data only
+```
+docker exec -t <container_id_or_name> pg_dump -U <username> -d <database_name> -t <table_name> --data-only --column-inserts > /path/on/host/machine/dump_file.sql
 ```
